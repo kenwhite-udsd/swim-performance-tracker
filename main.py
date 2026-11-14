@@ -1,4 +1,4 @@
-"""swim race tracker."""
+"""Swim race tracker."""
 
 from dataclasses import dataclass, field
 from drafter import *
@@ -51,11 +51,11 @@ def navigation(state: State) -> list:
         Button("Dashboard", "index"),
         Button("Add Race", "add_race_page"),
         Button("Results", "results_page",
-               [("event", state.selected_event)]),
+               Argument("event", state.selected_event)),
         Button("Personal Bests", "personal_bests_page"),
         Button("Goals", "goals_page"),
         Button("Progress", "progress_page",
-               [("event", state.selected_event)])
+               Argument("event", state.selected_event))
     ]
 
 
