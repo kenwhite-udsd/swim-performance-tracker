@@ -1,4 +1,4 @@
-"""swim race tracker"""
+"""swim race tracker."""
 
 from dataclasses import dataclass, field
 from drafter import *
@@ -51,11 +51,11 @@ def navigation(state: State) -> list:
         Button("Dashboard", "index"),
         Button("Add Race", "add_race_page"),
         Button("Results", "results_page",
-               [Argument("event", state.selected_event)]),
+               [("event", state.selected_event)]),
         Button("Personal Bests", "personal_bests_page"),
         Button("Goals", "goals_page"),
         Button("Progress", "progress_page",
-               [Argument("event", state.selected_event)])
+               [("event", state.selected_event)])
     ]
 
 
@@ -131,7 +131,7 @@ def personal_bests_page(state: State, event: str = "",
                         time_seconds: float = 0.0, race_date: str = "",
                         goal_seconds: float = 0.0) -> Page:
     """Display the fastest recorded time for each event."""
-    content = [Header("Personal Bests")]
+    content: list = [Header("Personal Bests")]
     for event in EVENTS:
         fastest = best_result(results_for_event(state, event))
         if fastest is None:
@@ -194,20 +194,23 @@ def progress_page(state: State, event: str = "", time_seconds: float = 0.0,
     else:
         first_time = matching_results[0].time_seconds
         fastest = best_result(matching_results)
-        content.append(Paragraph("First entered time: " + str(first_time) + " seconds"))
-        content.append(Paragraph("Current best: " + str(fastest.time_seconds) + " seconds"))
-        improvement = first_time - fastest.time_seconds
-        content.append(Paragraph("Improvement: " + str(round(improvement, 2)) + " seconds"))
-        if event in state.goal_times:
-            goal = state.goal_times[event]
-            content.append(Paragraph("Goal time: " + str(goal) + " seconds"))
-            if fastest.time_seconds <= goal:
-                content.append(Paragraph("Goal reached!"))
-            else:
-                content.append(Paragraph(
-                    str(round(fastest.time_seconds - goal, 2)) + " seconds to goal."))
+        if fastest is None:
+            content.append(Paragraph("Could not calculate a best time."))
         else:
-            content.append(Paragraph("Set a goal to track it here."))
+            content.append(Paragraph("First entered time: " + str(first_time) + " seconds"))
+            content.append(Paragraph("Current best: " + str(fastest.time_seconds) + " seconds"))
+            improvement = first_time - fastest.time_seconds
+            content.append(Paragraph("Improvement: " + str(round(improvement, 2)) + " seconds"))
+            if event in state.goal_times:
+                goal = state.goal_times[event]
+                content.append(Paragraph("Goal time: " + str(goal) + " seconds"))
+                if fastest.time_seconds <= goal:
+                    content.append(Paragraph("Goal reached!"))
+                else:
+                    content.append(Paragraph(
+                        str(round(fastest.time_seconds - goal, 2)) + " seconds to goal."))
+            else:
+                content.append(Paragraph("Set a goal to track it here."))
     content.extend(navigation(state))
     return Page(state, content)
 
@@ -228,3 +231,4 @@ hide_debug_information()
 set_website_framed(False)
 
 start_server(State())
+
